@@ -131,6 +131,7 @@ module ActionController
             unless (name.split('/').last || name).include? '.'
               name << (extension || self.default_static_extension)
             end
+
             return name
           end
 
@@ -183,7 +184,7 @@ module ActionController
           extension = ".#{type_symbol}"
         end
 
-        self.class.cache_page(content || response.body, path, extension, gzip)
+        self.class.cache_page(content || response.body, path, extension + request.query_string, gzip)
       end
 
       def caching_allowed?
