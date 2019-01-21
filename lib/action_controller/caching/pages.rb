@@ -77,7 +77,7 @@ module ActionController
 
         def cache(content, path, extension = nil, gzip = Zlib::BEST_COMPRESSION, query_string = '')
           instrument :write_page, path do
-            write(content, cache_path(path, extension), gzip)
+            write(content, cache_path(path, extension, query_string), gzip)
           end
         end
 
@@ -151,6 +151,7 @@ module ActionController
               name = name + (extension || default_extension)
             end
 
+            # require('pry-remote');binding.remote_pry
             if query_string.empty?
               name
             else
@@ -283,7 +284,7 @@ module ActionController
             extension = ".#{type_symbol}"
           end
 
-          page_cache.cache(content || response.body, path, extension, gzip, query_string)
+          page_cache.cache(content || response.body, path, extension, gzip, request.query_string)
         end
       end
 
