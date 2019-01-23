@@ -16,6 +16,9 @@ Gem::Specification.new do |gem|
   gem.license       = 'MIT'
 
   gem.add_dependency "actionpack", ">= 4.0.0", "< 6"
+  # gem.add_dependency "pry"
+  # gem.add_dependency "pry-remote"
+  # gem.add_dependency "rake"
 
   gem.add_development_dependency "mocha"
 end

@@ -60,6 +60,10 @@ module ActionController
         # or <tt>:best_speed</tt> or an integer configuring the compression level.
         class_attribute :page_cache_compression
         self.page_cache_compression ||= false
+
+        # Should we use query string on the files?
+        class_attribute :cache_query_string
+        self.cache_query_string ||= false
       end
 
       class PageCache #:nodoc:
@@ -76,7 +80,7 @@ module ActionController
         end
 
         def cache(content, path, extension = nil, gzip = Zlib::BEST_COMPRESSION, query_string = '')
-          instrument :write_page, path do
+          instrument :write_page, cache_path(path, extension, query_string) do
             write(content, cache_path(path, extension, query_string), gzip)
           end
         end
@@ -151,7 +155,6 @@ module ActionController
               name = name + (extension || default_extension)
             end
 
-            # require('pry-remote');binding.remote_pry
             if query_string.empty?
               name
             else
@@ -218,7 +221,7 @@ module ActionController
         def caches_page(*actions)
           if perform_caching
             options = actions.extract_options!
-
+            cache_query_string = options.fetch(:cache_query_string, cache_query_string)
             gzip_level = options.fetch(:gzip, page_cache_compression)
             gzip_level = \
               case gzip_level
@@ -233,7 +236,7 @@ module ActionController
               end
 
             after_action({ only: actions }.merge(options)) do |c|
-              c.cache_page(nil, nil, gzip_level, request.query_string)
+              c.cache_page(nil, nil, gzip_level, (cache_query_string || c.cache_query_string) ? request.query_string : nil)
             end
           end
         end
